@@ -8,7 +8,7 @@ docker-compose -f "docker-compose.yml" up -d --build
 # Geo DNS work  
 ![C10](screens/geo_dns.jpg)  
 port 8001 - have Ukrainian ip  
-port 8002 - have Canadia ip  
+port 8002 - have Canadian ip  
 port 8000 - have another country  ip  
 
 # Stats  
