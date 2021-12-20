@@ -1,0 +1,34 @@
+include "/etc/bind/geo/geoip.acl";
+
+# CDN for Ukraine
+view "ukraine" {
+  match-clients { UA; };
+  recursion no;
+
+   zone "example-cdn.com" {
+    type master;
+    file "/etc/bind/master/ua.example-cdn.com";
+  };
+};
+
+# CDN for Canada
+view "аrance" {
+  match-clients { CA; };
+  recursion no;
+
+   zone "example-cdn.com" {
+    type master;
+    file "/etc/bind/master/ca.example-cdn.com";
+  };
+};
+
+# CDN for Others
+view "global" {
+  match-clients { any; };
+  recursion no;
+
+  zone "example-cdn.com" {
+    type master;
+    file "/etc/bind/master/example-cdn.com";
+  };
+};

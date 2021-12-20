@@ -1,0 +1,165 @@
+networks:
+  cdn_stack:
+    driver: bridge
+    name: cdn_stack
+    ipam:
+     config:
+       - subnet: 172.28.0.0/16
+         gateway: 172.28.0.1
+
+services:
+  balancer_as_ru:
+    image: nginx:latest
+    container_name: balancer_as_ru
+    restart: always
+    ports:
+      - "8800:80"
+    networks:
+      cdn_stack:
+    dns:
+      - 172.28.0.5
+    volumes:
+      - ./nginx-balancer.conf:/etc/nginx/nginx.conf
+      - ./cache_as_ru:/data/nginx/cache
+    depends_on:
+      - bind
+      - balancer_ua
+      - node2
+      - node3
+
+  balancer_as_ua:
+    image: nginx:latest
+    container_name: balancer_as_ua
+    restart: always
+    ports:
+      - "8801:80"
+    networks:
+      cdn_stack:
+        ipv4_address: 172.28.8.10
+    dns:
+      - 172.28.0.5
+    volumes:
+      - ./nginx-balancer.conf:/etc/nginx/nginx.conf
+      - ./cache_as_ua:/data/nginx/cache
+    depends_on:
+      - bind
+      - balancer_ua
+      - node2
+      - node3
+
+  balancer_as_ca:
+    image: nginx:latest
+    container_name: balancer_as_ca
+    restart: always
+    ports:
+      - "8802:80"
+    networks:
+      cdn_stack:
+        ipv4_address: 172.28.7.10
+    dns:
+      - 172.28.0.5
+    volumes:
+      - ./nginx-balancer.conf:/etc/nginx/nginx.conf
+      - ./cache_as_ca:/data/nginx/cache
+    depends_on:
+      - bind
+      - balancer_ua
+      - node2
+      - node3
+
+  balancer_ua:
+    image: nginx:latest
+    container_name: balancer_ua
+    restart: always
+    networks:
+      cdn_stack:
+        aliases:
+          - balancer.local
+        ipv4_address: 172.28.3.10
+    volumes:
+      - ./nginx-balancer-ua.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - bind
+      - node1
+      - node1_1
+      - node1_2
+
+  bind:
+    image: sameersbn/bind:latest
+    container_name: bind
+    restart: always
+    environment:
+      - TZ=UTC
+    ports:
+      - "8853:53/tcp"
+      - "8853:53/udp"
+      - "127.0.0.1:10000:10000/tcp"
+    networks:
+      cdn_stack:
+        aliases:
+          - bind.local
+        ipv4_address: 172.28.0.5
+    volumes:
+      - ./bind:/data
+  
+  node1:
+    image: nginx:latest
+    container_name: node1
+    restart: always
+    networks:
+      cdn_stack:
+        aliases:
+          - node1.local
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./node1:/usr/share/nginx/html
+  
+  node1_1:
+    image: nginx:latest
+    container_name: node1_1
+    restart: always
+    networks:
+      cdn_stack:
+        aliases:
+          - node1_1.local
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./node1:/usr/share/nginx/html
+
+  node1_2:
+    image: nginx:latest
+    container_name: node1_2
+    restart: always
+    networks:
+      cdn_stack:
+        aliases:
+          - node1_2.local
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./node1:/usr/share/nginx/html
+
+  node2:
+    image: nginx:latest
+    container_name: node2
+    restart: always
+    networks:
+      cdn_stack:
+        aliases:
+          - node2.local
+        ipv4_address: 172.28.2.10
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./node2:/usr/share/nginx/html
+
+  node3:
+    image: nginx:latest
+    container_name: node3
+    restart: always
+    networks:
+      cdn_stack:
+        aliases:
+          - node3.local
+        ipv4_address: 172.28.1.10
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./node3:/usr/share/nginx/html

@@ -1,0 +1,10 @@
+zone_2=example.com	2	master	global	/etc/bind/master/eu.example.com
+base=/var/cache/bind
+pidfile_config=/var/run/bind/run/named.pid /var/run/named.pid /var/run/named/named.pid /var/run/bind/run/named/named.pid
+pidfile=/var/run/named/named.pid
+no_chroot_config=0
+version=3
+view_3=global	253
+view_1=russia	252
+zone_0=example.com	2	master	russia	/etc/bind/master/sng.example.com
+file_/etc/bind/named.conf.cdn=1640019800
